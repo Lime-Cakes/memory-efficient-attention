@@ -1,13 +1,16 @@
 import torch
-import numpy as np
 
 
-def dynamic_slice(x, starts, sizes):
-    # start_indices[i] = clamp(start_indices[i], 0, operand.dimension_size[i] - size_indices[i])
-    starts = [np.clip(starts[i], 0, x.shape[i] - sizes[i]) for i in range(len(starts))]
-    for i, (start, size) in enumerate(zip(starts, sizes)):
-        x = torch.index_select(x, i, torch.tensor(range(start, start + size), device=x.device))
-    return x
+from torch import Tensor
+from typing import List
+
+def dynamic_slice(
+    x: Tensor,
+    starts: List[int],
+    sizes: List[int],
+) -> Tensor:
+    slicing = [slice(start, start + size) for start, size in zip(starts, sizes)]
+    return x[slicing]
 
 
 def map_pt(f, xs):
